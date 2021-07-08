@@ -2,7 +2,7 @@ import { ProgressCanvas } from './progress-canvas'
 export { mountProgressCanvas as mount } from './mount'
 
 window.ProgressCanvas = ProgressCanvas
-window.mountProgressCanvas = mountProgressCanvas
+window.mountProgressCanvas = mount
 
 if (window.ProgressCanvasCallbacks) {
   window.ProgressCanvasCallbacks.forEach((callback) => {
