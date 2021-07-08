@@ -9,6 +9,15 @@ import { css } from '@emotion/css'
  */
 
 /**
+ * @typedef {object} ClassNames
+ * @property {string} block
+ * @property {string} canvas
+ * @property {string} overlay
+ * @property {string} text
+ * @property {string} container
+ */
+
+/**
  * @typedef {object} ProgressCanvasOptions
  * @property {number} width – the width of the canvas
  * @property {number} maxWidth – the width of the canvas
@@ -19,40 +28,29 @@ import { css } from '@emotion/css'
  * @property {string} borderColor
  * @property {number} borderWidth
  * @property {number} startAnimatingFraction
+ * @property {number} endAnimatingFraction
  * @property {string | undefined} title
  * @property {ProgressCanvasBlock[] | undefined} blocks
+ * @property {ClassNames} classNames
+ * @property {ClassNames} css
  */
 
 export class ProgressCanvas {
   /** @type {ProgressCanvasOptions} */
   static defaultOptions = {
-    width: 205,
-    height: 205,
-    radius: 100,
-    maxWidth: 390,
-    trackColor: 'white',
-    fillColor: '#0a2947',
-    borderColor: '#0a2947',
+    width: 200,
+    height: 200,
+    radius: 70,
+    maxWidth: '100%',
+    trackColor: 'lightgrey',
+    fillColor: 'green',
+    borderColor: 'green',
     borderWidth: 2,
     startAnimatingFraction: 10,
-    title: 'Less Sugar More Life',
-    blocks: [
-      {
-        message: 'Reduce\n sugar\n cravings',
-        position: 'top-right',
-        animateWhenProgress: 1,
-      },
-      {
-        message: 'Support healthy\n blood sugar',
-        position: 'bottom-center',
-        animateWhenProgress: 50,
-      },
-      {
-        message: 'Kickstart\n healthy\n habits',
-        position: 'top-left',
-        animateWhenProgress: 75,
-      },
-    ],
+    endAnimatingFraction: 1.5,
+    blocks: [],
+    css: {},
+    classNames: {},
   }
 
   /**
@@ -85,10 +83,14 @@ export class ProgressCanvas {
     this.container.classList.add(
       css`
         position: relative;
-        max-width: ${this.options.maxWidth}px;
+        max-width: ${typeof this.options.maxWidth === 'string'
+          ? this.options.maxWidth
+          : `${this.options.maxWidth}px`};
         margin-left: auto;
         margin-right: auto;
+        ${this.options.css.container}
       `,
+      this.options.classNames.container,
     )
   }
 
@@ -108,7 +110,7 @@ export class ProgressCanvas {
     const rect = this.container.getBoundingClientRect()
     const offsetY = rect.top + scrollY
     const startAnimating = offsetY / this.options.startAnimatingFraction
-    const endAnimating = offsetY / 1.5
+    const endAnimating = offsetY / this.options.endAnimatingFraction
     const progress = interpolate({
       inputRange: [startAnimating, endAnimating],
       outputRange: [0, 100],
@@ -157,20 +159,25 @@ export class ProgressCanvas {
 
   setupOverlayElements() {
     this.text = document.createElement('p')
-    this.text.className = css`
-      color: ${this.options.fillColor};
-      max-width: ${this.options.radius * 1.5}px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      transition: all ease-in-out 100ms;
-    `
+    this.text.classList.add(
+      css`
+        color: ${this.options.fillColor};
+        max-width: ${this.options.radius * 1.5}px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        transition: all ease-in-out 100ms;
+        ${this.options.css.text}
+      `,
+      this.options.classNames.text,
+    )
     this.text.textContent = this.options.title
 
     this.blocks = this.options.blocks.map((block, index) => {
       const content = document.createElement('p')
       content.innerHTML = block.message.replace('\n', '<br>')
-      content.className = css`
+      content.classList.add(this.options.classNames.block)
+      content.classList.add(css`
         position: absolute;
         font-size: 1.15rem;
         line-height: 1.5rem;
@@ -192,7 +199,9 @@ export class ProgressCanvas {
           margin-right: 0.5rem;
           display: block;
         }
-      `
+
+        ${this.options.css.block}
+      `)
 
       this.container.appendChild(content)
       const height = content.getBoundingClientRect().height
@@ -233,7 +242,7 @@ export class ProgressCanvas {
 
     this.overlay = document.createElement('div')
     this.overlay.appendChild(this.text)
-    this.overlay.className = css`
+    this.overlay.classList.add(css`
       position: absolute;
       left: 0;
       right: 0;
@@ -243,7 +252,9 @@ export class ProgressCanvas {
       justify-content: center;
       align-items: center;
       height: ${this.options.radius * 2}px;
-    `
+      ${this.options.css.overlay}
+    `)
+    this.overlay.classList.add(this.options.classNames.overlay)
     this.container.appendChild(this.overlay)
   }
 
@@ -256,6 +267,12 @@ export class ProgressCanvas {
       canvas.id = this.id
       this.container.appendChild(canvas)
     }
+    canvas.classList.add(this.options.classNames.canvas)
+    canvas.classList.add(
+      css`
+        ${this.options.css.canvas}
+      `,
+    )
     return canvas
   }
 

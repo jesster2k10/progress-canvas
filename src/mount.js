@@ -1,6 +1,12 @@
 import { ProgressCanvas } from './progress-canvas'
 
-export function mountProgressCanvas(elementOrSelector) {
+/**
+ * @param {string | HTMLDivElement} elementOrSelector
+ * @param {import('./progress-canvas').ProgressCanvasOptions | undefined} options
+ *
+ * @returns {ProgressCanvas}
+ */
+export function mountProgressCanvas(elementOrSelector, options) {
   let element = elementOrSelector
   const isSelector = typeof elementOrSelector === 'string'
 
@@ -15,5 +21,5 @@ export function mountProgressCanvas(elementOrSelector) {
     return
   }
 
-  new ProgressCanvas(element)
+  return new ProgressCanvas(element, options)
 }
