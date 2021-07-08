@@ -45,6 +45,7 @@ export class ProgressCanvas {
     trackColor: 'lightgrey',
     fillColor: 'green',
     borderColor: 'green',
+    accentColor: 'red',
     borderWidth: 2,
     startAnimatingFraction: 10,
     endAnimatingFraction: 1.5,
@@ -192,7 +193,7 @@ export class ProgressCanvas {
         transform: translateY(-10px);
         &:before {
           content: '${index + 1}.';
-          color: red;
+          color: ${this.options.accentColor};
           font-size: 2rem;
           line-height: 2rem;
           font-weight: bold;
