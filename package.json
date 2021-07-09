@@ -23,6 +23,6 @@
     "interpolate-range": "^2.1.0"
   },
   "browserslist": [
-    "last 1 version, not dead, ie >= 10"
+    "last 1 version, not dead, ie >= 11"
   ]
 }

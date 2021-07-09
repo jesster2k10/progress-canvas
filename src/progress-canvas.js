@@ -18,6 +18,11 @@ import { css } from '@emotion/css'
  */
 
 /**
+ * @typedef {object} BreakPointConfig<T>
+ * @property {T} sm
+ */
+
+/**
  * @typedef {object} ProgressCanvasOptions
  * @property {number} width – the width of the canvas
  * @property {number} maxWidth – the width of the canvas
@@ -27,7 +32,7 @@ import { css } from '@emotion/css'
  * @property {string} fillColor
  * @property {string} borderColor
  * @property {number} borderWidth
- * @property {number} startAnimatingFraction
+ * @property {number | BreakPointConfig<number>} startAnimatingFraction
  * @property {number} endAnimatingFraction
  * @property {string | undefined} title
  * @property {ProgressCanvasBlock[] | undefined} blocks
@@ -108,19 +113,19 @@ export class ProgressCanvas {
 
   onScroll() {
     const { scrollY } = window
-    const rect = this.container.getBoundingClientRect()
-    const offsetY = rect.top + scrollY
-    const startAnimating = offsetY / this.options.startAnimatingFraction
-    const endAnimating = offsetY / this.options.endAnimatingFraction
-    const progress = interpolate({
-      inputRange: [startAnimating, endAnimating],
+    this.rect = this.container.getBoundingClientRect()
+    this.offsetY = this.rect.top + scrollY
+    this.startAnimating = this.offsetY / this.options.startAnimatingFraction
+    this.endAnimating = this.offsetY / this.options.endAnimatingFraction
+    this.progress = interpolate({
+      inputRange: [this.startAnimating, this.endAnimating],
       outputRange: [0, 100],
       clamp: true,
     })(scrollY)
 
     this.blocks.forEach(({ element, block }) => {
       const { animateWhenProgress } = block
-      if (progress >= animateWhenProgress) {
+      if (this.progress >= animateWhenProgress) {
         element.classList.add(this.activeBlockClass)
       } else {
         element.classList.remove(this.activeBlockClass)
@@ -128,9 +133,9 @@ export class ProgressCanvas {
     })
 
     requestAnimationFrame(() => {
-      this.renderProgress(progress)
+      this.renderProgress(this.progress)
 
-      if (progress >= 75) {
+      if (this.progress >= 75) {
         this.text.style.color = 'white'
       } else {
         this.text.style.color = this.options.fillColor
